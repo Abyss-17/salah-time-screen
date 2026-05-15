@@ -1,0 +1,1881 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Figtree:ital,wght@0,300..900;1,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+
+/* start: Global */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Figtree", sans-serif;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  cursor: none;
+  --scroll-bar-height: 0px;
+}
+body.has-scroll-bar {
+  --scroll-bar-height: 7vh;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+/* end: Global */
+
+/* start: Badge Test */
+.badge-test {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 12vw;
+  height: 12vw;
+  pointer-events: none;
+  overflow: hidden;
+}
+.badge-test-text {
+  background-color: #ef4444;
+  font-size: 1.5vw;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 1.5vw;
+  text-align: center;
+  transform: translate(-40%, -90%) rotateZ(45deg);
+  transform-origin: center;
+  width: 150%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #fff;
+}
+/* end: Badge Test */
+
+/* start: Screen */
+.screen-slide {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: calc(100vh - var(--scroll-bar-height));
+  width: 100vw;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out;
+}
+.screen-slide[data-screen-size="half"] {
+  width: 50vw;
+  left: 50vw;
+  top: 0;
+  height: calc(100vh - var(--scroll-bar-height));
+}
+.screen-slide.active {
+  opacity: 1;
+  visibility: visible;
+}
+.screen-timetable-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1.5vh;
+  padding: 3vh 0;
+  min-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out;
+  background: #f1f5f9;
+}
+/* Move timetable to left for text/image widgets */
+.screen-timetable-container[data-timetable-left] {
+  left: 0;
+  right: auto;
+}
+.screen-timetable-container.active {
+  opacity: 1;
+  visibility: visible;
+}
+/* Responsive styles for timetable in half screen */
+.screen-timetable-container .screen-time-next-title {
+  font-size: clamp(14px, 1.15vw, 18px);
+  margin-bottom: 0.4vh;
+}
+.screen-timetable-container .screen-time-next-time > span {
+  font-size: clamp(28px, 2.85vw, 44px);
+  margin-left: 0.5vw;
+  margin-right: 0.3vw;
+}
+.screen-timetable-container
+  .screen-time-next-time
+  > .screen-time-next-time-seconds {
+  font-size: clamp(24px, 2vw, 32px);
+  margin-left: 0.1vw;
+  min-width: 3vw;
+  font-weight: 400;
+}
+.screen-time-next-time-seconds > span {
+  font-size: clamp(24px, 2vw, 32px);
+  font-weight: 500;
+  margin-left: 0.1vw;
+  color: #5e7999;
+}
+.screen-timetable-container .screen-time-table-head {
+  padding: 1vh 0.8vw;
+  height: 5.5vh;
+  font-size: 1.3vw;
+  text-align: left;
+  white-space: unset;
+  line-height: 1.3;
+}
+.screen-timetable-container .screen-time-table-fixed {
+  width: 10vw;
+}
+.screen-timetable-container .screen-time-ampm {
+  font-size: 1.5vw;
+}
+.screen-time-time-suffix {
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-left: 4px;
+  margin-bottom: 2px;
+  font-family: Poppins;
+  font-weight: 500;
+  color: #7f91a5;
+
+  font-weight: 500;
+  font-size: clamp(9px, 0.71vw, 10px);
+}
+.screen-status {
+  position: absolute;
+  top: 1.5vw;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5vw;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  padding: 0.8vw 1.5vw;
+  border-radius: 1vw;
+  background-color: #fff;
+  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.1);
+}
+/* end: Screen */
+
+/* start: Screen Time */
+.screen-time {
+  height: calc(100vh - var(--scroll-bar-height));
+  width: 100vw;
+  display: flex;
+}
+.screen-time-left {
+  width: 50vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  display: flex;
+  flex-direction: column;
+  background-color: #059669;
+  color: #fff;
+  /* background-image:
+    linear-gradient(0deg, #00000005 1px, transparent 1px),
+    linear-gradient(90deg, #00000005 1px, transparent 1px);
+  background-size: 3vw 3vw; */
+}
+.screen-time-header {
+  padding: 4vh 4vw;
+  flex-shrink: 0;
+  text-align: center;
+}
+.screen-time-mosque {
+  font-size: 2.5vw;
+  font-weight: 700;
+  margin-bottom: 2.5vh;
+  line-height: 1.2;
+}
+.screen-time-clock {
+  padding: 2vh 4vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  min-height: 0;
+  height: calc(100vh - 12vh - 6vh);
+}
+.screen-time-brand {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.screen-time-brand-image {
+  height: 8vh;
+  width: auto;
+}
+.screen-time-next {
+  padding: 1.5vh 3vw;
+  text-align: center;
+  background: #ecfdf5;
+  border-bottom: 1px solid #e8f5f0;
+}
+.screen-time-next-title {
+  margin-bottom: 0.6vh;
+  line-height: 1.3;
+
+  font-size: clamp(14px, 1.15vw, 18px);
+  font-family: Poppins;
+  font-weight: 400;
+  color: #1e1515;
+}
+.screen-time-next-time {
+  font-weight: 500;
+  color: #5e7999;
+  line-height: 1.2;
+  font-family: Poppins;
+  font-weight: 400;
+  font-size: clamp(24px, 2vw, 32px);
+}
+.screen-time-next-time > span {
+  font-size: clamp(28px, 2.85vw, 44px);
+  font-weight: 700;
+  display: inline-block;
+  margin-left: 0.5vw;
+  margin-right: 0.3vw;
+  color: #059669;
+  font-family: Poppins;
+  font-weight: 700;
+}
+.screen-time-prayer {
+  margin: 0 1.5vw;
+  background: #fff;
+  border-radius: 1.5vw;
+  box-shadow: 0 0.3vw 1.5vw rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.screen-time-table {
+  width: 100%;
+}
+.screen-time-table-row {
+  border-bottom: 1px solid #f1f5f9;
+}
+.screen-time-table-row.active {
+  color: #059669;
+  box-shadow: inset 0.35vw 0 #059669;
+}
+.screen-time-table-row.active .screen-time-table-data {
+  font-weight: 700;
+  font-size: 2.5vw;
+}
+.screen-time-table-container {
+  padding: 0 3.2vw;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+}
+.screen-time-table-head {
+  padding: 1.2vh 0.8vw;
+  height: 6vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-size: 1.2vw;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.screen-time-table-data {
+  padding: 0 0.8vw;
+  height: 8vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-size: 1.6vw;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.screen-time-table-data.screen-time-table-grow {
+  text-align: left;
+}
+.screen-time-table-grow {
+  flex-grow: 1;
+  min-width: 0;
+}
+.screen-time-table-truncate {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.screen-time-table-fixed {
+  flex-shrink: 0;
+  width: 10vw;
+}
+.screen-time-time {
+  font-size: 1.7vw;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: flex-end;
+}
+.screen-time-time[data-time$="-jammat"],
+.screen-time-time[data-time$="-tomorrow"] {
+  font-size: 2vw;
+}
+.screen-time-table-row.active .screen-time-time {
+  font-size: 2.5vw;
+}
+.screen-time-ampm {
+  font-size: 1.5vw;
+  vertical-align: super;
+  display: none;
+}
+.screen-time-digital {
+  padding: 2.5vh 3vw 1vh;
+  text-align: center;
+  flex-shrink: 0;
+}
+.screen-time-digital-time {
+  font-size: 4.5vw;
+  font-weight: 700;
+  display: inline-block;
+  line-height: 1.1;
+}
+.screen-time-digital-text {
+  font-size: 1.5vw;
+  font-weight: 500;
+  margin-bottom: 0.5vh;
+  line-height: 1.3;
+  color: #fff;
+}
+.screen-time-digital-text:last-child {
+  margin-bottom: 0;
+}
+/* start: Screen Time Bottom Card */
+.screen-time-bottom-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  margin: 0 1.5vw;
+  background: #fff;
+  border-radius: 1.5vw;
+  box-shadow: 0 0.3vw 1.5vw rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0px 1px 2px -1px #0000001a;
+}
+.screen-time-bottom-card-cell {
+  min-width: 0;
+  min-height: 0;
+}
+/* end: Screen Time Bottom Card */
+/* start: Screen Time Footer */
+.screen-time-footer-cell {
+  flex: 1;
+  padding: 2vh 2vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 6vh;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+}
+.screen-time-next.screen-time-bottom-card-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid #e8f5f0;
+  border-bottom: 1px solid #e8f5f0;
+}
+#screen-time-jummah-cell {
+  border-bottom: 1px solid #e8f5f0;
+}
+#shouruq-cell {
+  border-right: 1px solid #e8f5f0;
+}
+#zawal-cell .screen-time-footer-label {
+  font-family: Poppins;
+  font-weight: 400;
+  font-size: clamp(13px, 1.05vw, 16px);
+  color: #1e1515;
+  text-transform: uppercase;
+}
+#zawal-cell .screen-time-footer-value {
+  font-family: Poppins;
+  font-weight: 600;
+  font-size: clamp(18px, 1.4vw, 22px);
+  color: #4b4444;
+}
+.screen-time-footer-label {
+  font-size: clamp(13px, 1.05vw, 16px);
+  margin-bottom: 0.3vh;
+  letter-spacing: 0.05em;
+  font-family: Poppins;
+  font-weight: 400;
+  color: #1e1515;
+  text-transform: uppercase;
+}
+.screen-time-footer-value {
+  font-size: clamp(18px, 1.4vw, 22px);
+  line-height: 1.4;
+  font-family: Poppins;
+  font-weight: 600;
+  color: #1e1515;
+}
+/* end: Screen Time Footer */
+/* end: Screen Time */
+
+/* start: Not Found */
+.screen-not-found {
+  height: calc(100vh - var(--scroll-bar-height));
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+}
+.screen-not-found-text {
+  text-align: center;
+  font-size: 2.5vw;
+  line-height: 1.4;
+}
+/* end: Not Found */
+
+/* start: Analog Clock */
+.analog-clock {
+  position: relative;
+  max-width: 45vw;
+  max-height: 75vh;
+  width: 40vw;
+  height: 40vw;
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+.analog-clock-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: visible;
+}
+.analog-clock-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 2vw;
+  font-weight: 700;
+  color: #fff;
+  user-select: none;
+  padding-top: 2vh;
+  transform: rotateZ(calc(var(--analog-clock-id) * 30deg));
+}
+.analog-clock-number > span {
+  transform: rotate(calc(var(--analog-clock-id) * -30deg));
+  display: block;
+  margin: 0 auto;
+}
+.analog-clock-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%)
+    rotateZ(calc(var(--analog-clock-line) * 6deg));
+  text-align: center;
+}
+.analog-clock-line::before {
+  content: "";
+  display: block;
+  margin: 0 auto;
+  width: 0.15vw;
+  height: 1vh;
+  background-color: #fff;
+  opacity: 0.2;
+}
+.analog-clock-line.major::before {
+  height: 2vh;
+  width: 0.3vw;
+  opacity: 0.8;
+}
+.analog-clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  border-radius: 1vw;
+}
+.analog-clock-hour {
+  width: 1vw;
+  height: 20%;
+  background: #fff;
+  margin-left: calc(1vw / -2);
+  z-index: 3;
+}
+.analog-clock-minute {
+  width: 0.6vw;
+  height: 35%;
+  background: #fff;
+  margin-left: calc(0.6vw / -2);
+  z-index: 2;
+}
+.analog-clock-second {
+  width: 0.3vw;
+  height: 40%;
+  background: #ef4444;
+  margin-left: calc(0.3vw / -2);
+  z-index: 4;
+}
+.analog-clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.2vw;
+  height: 1.2vw;
+  background: #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+/* Salah time markers on analog clock */
+.analog-clock-salah-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%) rotateZ(var(--salah-angle));
+  pointer-events: none;
+  z-index: 1;
+}
+.analog-clock-salah-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0.4vw;
+  height: 8%;
+  background-color: #9ca3af;
+  margin-left: calc(0.4vw / -2);
+  transition: all 0.3s ease;
+}
+.analog-clock-salah-marker.active .analog-clock-salah-line {
+  background-color: #059669;
+  width: 0.6vw;
+  margin-left: calc(0.6vw / -2);
+  height: 10%;
+}
+.analog-clock-salah-label {
+  position: absolute;
+  top: 11%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6vw;
+  font-weight: 600;
+  color: #9ca3af;
+  white-space: nowrap;
+  text-align: center;
+  padding: 0.8vw 0.3vh;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.9);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transition: all 0.3s ease;
+}
+/* Use sideways writing mode for lower half of clock (angles < 180deg) */
+.analog-clock-salah-marker.lower-half .analog-clock-salah-label {
+  writing-mode: sideways-lr;
+}
+.analog-clock-salah-marker.active .analog-clock-salah-label {
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.8vw;
+  background-color: rgba(5, 150, 105, 0.15);
+}
+/* end: Analog Clock */
+
+/* start: Screen Text */
+.screen-text {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4vh 4vw;
+  background: var(--theme-bg, transparent);
+  color: var(--theme-text-color, #000);
+}
+.screen-text-text {
+  font-weight: 700;
+  font-size: 4.5vw;
+  word-break: break-word;
+  line-height: 1.3;
+  max-width: 90vw;
+}
+/* end: Screen Text */
+
+/* start: Screen Image */
+.screen-image {
+  height: 100%;
+  width: 100%;
+  padding: 4vh 4vw;
+  background-color: #059669;
+  background-image:
+    linear-gradient(0deg, #00000005 1px, transparent 1px),
+    linear-gradient(90deg, #00000005 1px, transparent 1px);
+  background-size: 3vw 3vw;
+}
+.screen-image-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* end: Screen Image */
+
+/* start: Screen QR */
+.screen-qr {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2vh 4vw;
+  background-color: #0d5642;
+  background-image:
+    linear-gradient(0deg, #00000005 1px, transparent 1px),
+    linear-gradient(90deg, #00000005 1px, transparent 1px);
+  background-size: 3vw 3vw;
+}
+.screen-qr-header {
+  text-align: center;
+  margin-bottom: 3vh;
+}
+.screen-qr-title {
+  font-size: 1.8vw;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1vh;
+  line-height: 1.4;
+}
+.screen-qr-mosque {
+  font-size: 3vw;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 1vh;
+}
+.screen-qr-image {
+  width: 35vw;
+  height: 35vw;
+  max-width: 50vh;
+  max-height: 50vh;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screen-qr-image .screen-image-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* end: Screen QR */
+
+/* start: Screen Jummah Donation */
+.screen-jummah-donation {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #0d5642;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.screen-jummah-donation-stripes {
+  pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+.screen-jummah-donation-stripes svg {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.screen-jummah-donation-stripes svg:nth-child(1) {
+  bottom: 21.46vw;
+}
+.screen-jummah-donation-stripes svg:nth-child(2) {
+  bottom: 17.97vw;
+}
+.screen-jummah-donation-stripes svg:nth-child(3) {
+  bottom: 13.4vw;
+}
+.screen-jummah-donation-stripes svg:nth-child(4) {
+  bottom: 6.12vw;
+}
+.screen-jummah-donation-stripes svg:nth-child(5) {
+  bottom: -1px;
+}
+.screen-jummah-donation-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 70vw;
+  margin: 0 auto;
+  padding: 3vh 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vh;
+  text-align: center;
+}
+.screen-jummah-donation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5vw;
+  padding: 0.6vh 1.5vw;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 185, 0, 0.2) 0%,
+    rgba(255, 210, 48, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 185, 0, 0.3);
+  border-radius: 9999px;
+}
+.screen-jummah-donation-badge-dot {
+  width: 0.5vw;
+  height: 0.5vw;
+  background: #ffb900;
+  border-radius: 50%;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.screen-jummah-donation-badge-text {
+  font-size: 0.9vw;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fee685;
+}
+.screen-jummah-donation-headline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.screen-jummah-donation-headline-line1 {
+  font-family: "Cormorant Garamond", "Poppins", serif;
+  font-weight: 700;
+  font-size: 7vw;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.screen-jummah-donation-headline-line2 {
+  font-family: "Cormorant Garamond", "Poppins", serif;
+  font-weight: 700;
+  font-size: 7vw;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #fee685 0%, #fef3c6 50%, #fee685 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.screen-jummah-donation-description {
+  font-size: 1.6vw;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(234, 246, 243, 0.9);
+  max-width: 55vw;
+}
+.screen-jummah-donation-qr-card {
+  position: relative;
+  width: 16vw;
+  height: 16vw;
+  border-radius: 1.5vw;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 0 2vw 0.5vw rgba(0, 0, 0, 0.6);
+}
+.screen-jummah-donation-qr-beam {
+  position: absolute;
+  width: 5vw;
+  height: 160%;
+  top: -30%;
+  left: calc(50% - 2.5vw);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #00ff33,
+    #00ff33,
+    transparent
+  );
+  animation: jummah-qr-spin 4s infinite linear;
+  transform-origin: center center;
+  z-index: 0;
+}
+@keyframes jummah-qr-spin {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+.screen-jummah-donation-qr-glass {
+  position: absolute;
+  inset: 0.2vw;
+  border-radius: 1.3vw;
+  background-color: rgba(17, 25, 40, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  z-index: 1;
+}
+.screen-jummah-donation-qr-inner {
+  position: absolute;
+  inset: 0.6vw;
+  background-color: #fff;
+  border-radius: 0.8vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.5vw;
+}
+.screen-jummah-donation-qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.screen-jummah-donation-stores {
+  display: flex;
+  gap: 1.5vw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.screen-jummah-donation-store-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8vw;
+  padding: 1.2vh 2vw;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 79, 59, 0.6) 0%,
+    rgba(0, 96, 69, 0.6) 100%
+  );
+  border: 1px solid rgba(0, 212, 146, 0.3);
+  border-radius: 0.8vw;
+  min-width: 14vw;
+}
+.screen-jummah-donation-store-icon {
+  width: 2.5vw;
+  height: 2.5vw;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screen-jummah-donation-store-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.screen-jummah-donation-store-texts {
+  display: flex;
+  flex-direction: column;
+}
+.screen-jummah-donation-store-label {
+  font-size: 0.7vw;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(164, 244, 207, 0.8);
+  white-space: nowrap;
+}
+.screen-jummah-donation-store-name {
+  font-size: 1vw;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+/* end: Screen Jummah Donation */
+
+/* start: Screen Fundraiser */
+.screen-fundraiser {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+.screen-fundraiser-left {
+  width: 50vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  background: linear-gradient(135deg, #00bc7d 0%, #009966 50%, #009689 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6vh 4vw;
+}
+.screen-fundraiser-carousel {
+  position: relative;
+  width: 100%;
+  height: 45vh;
+  overflow: hidden;
+  border-radius: 2vw;
+  background-color: #f3f4f6;
+}
+.screen-fundraiser-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2vw;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.screen-fundraiser-image.active {
+  opacity: 1;
+}
+.screen-fundraiser-left-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4vh 2vw;
+  width: 100%;
+}
+.screen-fundraiser-left-title {
+  font-size: 3.5vw;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2vh;
+  line-height: 1.2;
+  overflow: hidden;
+  width: 100%;
+  text-align: left;
+}
+.screen-fundraiser-left-title > span {
+  white-space: nowrap;
+  animation: marquee 15s linear infinite;
+  display: inline-block;
+  transform: translateX(calc(50vw - 12vw));
+}
+@keyframes marquee {
+  from {
+    transform: translateX(calc(50vw - 12vw));
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+.screen-fundraiser-left-description {
+  font-size: 1.8vw;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.4;
+}
+.screen-fundraiser-right {
+  width: 50vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 5vw;
+}
+.screen-fundraiser-right-content {
+  max-width: 40vw;
+  width: 100%;
+}
+.screen-fundraiser-right-title {
+  font-size: 3.5vw;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 2vh;
+  line-height: 1.2;
+  text-align: center;
+}
+.screen-fundraiser-right-description {
+  font-size: 2vw;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4vh;
+  line-height: 1.4;
+  text-align: center;
+}
+.screen-fundraiser-progress-container {
+  border-top: 2px solid #e5e7eb;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 3vh 0;
+  margin-bottom: 4vh;
+}
+.screen-fundraiser-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2vh;
+  gap: 2vw;
+}
+.screen-fundraiser-progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  flex: 1;
+}
+.screen-fundraiser-progress-item:first-child {
+  align-items: flex-start;
+}
+.screen-fundraiser-progress-item:last-child {
+  align-items: flex-end;
+}
+.screen-fundraiser-progress-label {
+  font-size: 1.3vw;
+  font-weight: 600;
+  color: #6b7280;
+}
+.screen-fundraiser-progress-amount {
+  font-size: 2.2vw;
+  font-weight: 700;
+  color: #1f2937;
+}
+.screen-fundraiser-progress-bar {
+  width: 100%;
+  height: 2.5vh;
+  background-color: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 2vh;
+}
+.screen-fundraiser-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00bc7d 0%, #009966 100%);
+  transition: width 0.5s ease;
+}
+.screen-fundraiser-progress-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5vw;
+}
+.screen-fundraiser-progress-footer-left {
+  font-weight: 700;
+  color: #059669;
+}
+.screen-fundraiser-progress-footer-right {
+  font-weight: 600;
+  color: #6b7280;
+}
+.screen-fundraiser-quote {
+  text-align: center;
+}
+.screen-fundraiser-quote-footer {
+  font-size: 1.3vw;
+  font-weight: 500;
+  color: #6b7280;
+  line-height: 1.5;
+}
+.screen-fundraiser-right-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  margin-top: 8vh;
+  padding: 0 1vw;
+}
+.screen-fundraiser-right-footer-qr {
+  flex-shrink: 0;
+}
+.screen-fundraiser-right-footer-qr-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 0px 11.14px 0px #99999940;
+}
+.screen-fundraiser-right-footer-qr-image {
+  width: 14vw;
+  height: 14vw;
+  object-fit: contain;
+  display: block;
+}
+.screen-fundraiser-right-footer-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vh;
+  line-height: 1.4;
+}
+.screen-fundraiser-right-footer-scan {
+  font-size: 1.5vw;
+  font-weight: 600;
+}
+.screen-fundraiser-right-footer-or {
+  font-size: 1.3vw;
+  font-weight: 400;
+  color: #6b7280;
+}
+.screen-fundraiser-right-footer-visit {
+  font-size: 1.5vw;
+  font-weight: 600;
+}
+.screen-fundraiser-right-footer-link {
+  color: #059669;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* end: Screen Fundraiser */
+
+/* start: Jamaat Warning */
+.jamaat-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  background-color: #059669;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease-in-out,
+    visibility 0.5s ease-in-out;
+}
+.jamaat-warning-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.jamaat-warning-icon-box {
+  width: 22vw;
+  height: 22vw;
+  max-width: 28vh;
+  max-height: 28vh;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 2vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3vh;
+  padding: 2vw;
+}
+.jamaat-warning-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.jamaat-warning-message {
+  font-size: 4vw;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 2vh;
+  line-height: 1.3;
+  max-width: 80vw;
+}
+.jamaat-warning-description {
+  font-size: 1.5vw;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin-bottom: 3vh;
+  line-height: 1.4;
+  max-width: 70vw;
+}
+.jamaat-warning-countdown {
+  font-size: 5vw;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+}
+.jamaat-warning-countdown-label {
+  font-size: 2vw;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1vh;
+}
+.jamaat-warning-countdown-time {
+  font-size: 8vw;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+}
+.jamaat-warning-countdown-time span {
+  display: inline-block;
+  min-width: 3.5vw;
+  text-align: center;
+}
+.jamaat-warning-prayer-name {
+  font-size: 3vw;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  margin-top: 2vh;
+}
+/* end: Jamaat Warning */
+
+/* start: Jamaat In Progress */
+.jamaat-in-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - var(--scroll-bar-height));
+  background-color: #059669;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease-in-out,
+    visibility 0.5s ease-in-out;
+}
+.jamaat-in-progress-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.jamaat-in-progress-content {
+  text-align: center;
+}
+.jamaat-in-progress-logo {
+  width: 15vw;
+  height: auto;
+  margin-bottom: 4vh;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.jamaat-in-progress-title {
+  font-size: 5vw;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 90vw;
+}
+/* end: Jamaat In Progress */
+
+/* start: Scroll Message Bar */
+.scroll-message-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 7vh;
+  min-height: 32px;
+  background-color: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.scroll-message-bar-inner {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: scroll-message-marquee 50s linear infinite;
+  will-change: transform;
+}
+.scroll-message-bar-text {
+  font-size: 2vw;
+  font-weight: 500;
+  color: #fff;
+  padding-right: 0;
+  display: inline-block;
+}
+.scroll-message-bar-sep {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 1.5vw;
+  font-style: normal;
+}
+@keyframes scroll-message-marquee {
+  from {
+    transform: translateX(100vw);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+/* end: Scroll Message Bar */
+
+/* start: Responsive Media Queries - Landscape Optimized */
+
+/* Small landscape screens (small tablets, small TVs) */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .screen-time-mosque {
+    font-size: 2.2vw;
+  }
+
+  .analog-clock {
+    max-width: 40vw;
+    max-height: 65vh;
+    width: 35vw;
+    height: 35vw;
+  }
+
+  .screen-time-table-head {
+    font-size: 1vw;
+    height: 3.5vh;
+  }
+
+  .screen-time-table-data {
+    font-size: 1.4vw;
+    height: 6vh;
+  }
+
+  .screen-time-table-fixed {
+    width: 9vw;
+  }
+}
+
+/* Medium landscape screens (standard desktop monitors, medium TVs) */
+@media (min-width: 1025px) and (max-width: 1920px) and (orientation: landscape) {
+  .analog-clock {
+    max-width: 42vw;
+    max-height: 72vh;
+    width: 38vw;
+    height: 38vw;
+  }
+}
+
+/* Large landscape screens (large monitors, large TVs, 1080p+) */
+@media (min-width: 1921px) and (orientation: landscape) {
+  .screen-time-mosque {
+    font-size: 2.8vw;
+  }
+
+  .analog-clock {
+    max-width: 44vw;
+    max-height: 75vh;
+    width: 40vw;
+    height: 40vw;
+  }
+
+  .screen-time-table-head {
+    font-size: 1.2vw;
+  }
+
+  .screen-time-table-data {
+    font-size: 1.7vw;
+  }
+
+  .screen-text-text {
+    font-size: 5vw;
+  }
+
+  .screen-qr-title {
+    font-size: 2.8vw;
+  }
+
+  .screen-qr-mosque {
+    font-size: 3.5vw;
+  }
+
+  .screen-fundraiser-left-title {
+    font-size: 4vw;
+  }
+
+  .screen-fundraiser-left-description {
+    font-size: 2vw;
+  }
+
+  .screen-fundraiser-right-title {
+    font-size: 4vw;
+  }
+
+  .screen-fundraiser-right-description {
+    font-size: 2.2vw;
+  }
+}
+
+/* Ultra-wide aspect ratios (21:9, 32:9, etc.) */
+@media (min-aspect-ratio: 21/9) and (orientation: landscape) {
+  .screen-text {
+    padding: 5vh 12vw;
+  }
+}
+
+/* Standard aspect ratios (16:9, 16:10) */
+@media (min-aspect-ratio: 16/10) and (max-aspect-ratio: 16/9) and (orientation: landscape) {
+  .analog-clock {
+    max-width: 43vw;
+    max-height: 73vh;
+  }
+}
+
+/* Shorter screens (closer to 4:3) */
+@media (max-aspect-ratio: 16/10) and (orientation: landscape) {
+  .screen-time-clock {
+    height: calc(100vh - 10vh - 5vh);
+  }
+
+  .analog-clock {
+    max-width: 65vmin;
+    max-height: 65vmin;
+    width: 35vw;
+    height: 35vw;
+  }
+
+  .screen-time-table-head {
+    height: 4.5vh;
+  }
+
+  .screen-time-table-data {
+    height: 8vh;
+  }
+}
+
+/* High DPI screens (retina displays, 4K, etc.) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .analog-clock-line::before {
+    width: 0.2vw;
+  }
+
+  .analog-clock-line.major::before {
+    width: 0.35vw;
+  }
+
+  .analog-clock-hand {
+    border-radius: 1.2vw;
+  }
+}
+
+/* Vertical height constraints */
+@media (max-height: 600px) and (orientation: landscape) {
+  .screen-time-mosque {
+    font-size: 2.2vw;
+    margin-bottom: 1vh;
+  }
+
+  .screen-time-brand-image {
+    height: 6vh;
+  }
+}
+
+/* Minimum size constraints for very small screens */
+@media (max-width: 640px) and (orientation: landscape) {
+  .screen-time-mosque {
+    font-size: 20px;
+  }
+
+  .screen-time-table-head {
+    font-size: 12px;
+  }
+
+  .screen-time-table-data {
+    font-size: 16px;
+  }
+
+  .screen-time-time {
+    font-size: 16px;
+  }
+
+  .screen-text-text {
+    font-size: 28px;
+  }
+
+  .analog-clock-number {
+    font-size: 14px;
+  }
+
+  .screen-fundraiser-left-title,
+  .screen-fundraiser-right-title {
+    font-size: 24px;
+  }
+
+  .screen-fundraiser-left-description,
+  .screen-fundraiser-right-description {
+    font-size: 16px;
+  }
+}
+
+/* Maximum size constraints for very large screens */
+@media (min-width: 3840px) and (orientation: landscape) {
+  .screen-time-mosque {
+    font-size: 48px;
+  }
+
+  .screen-time-table-head {
+    font-size: 16px;
+  }
+
+  .screen-time-table-data {
+    font-size: 26px;
+  }
+
+  .screen-time-time {
+    font-size: 26px;
+  }
+
+  .screen-text-text {
+    font-size: 84px;
+  }
+
+  .analog-clock-number {
+    font-size: 36px;
+  }
+
+  .screen-qr-title {
+    font-size: 42px;
+  }
+
+  .screen-qr-mosque {
+    font-size: 56px;
+  }
+
+  .screen-fundraiser-left-title,
+  .screen-fundraiser-right-title {
+    font-size: 70px;
+  }
+
+  .screen-fundraiser-left-description,
+  .screen-fundraiser-right-description {
+    font-size: 48px;
+  }
+
+  .screen-fundraiser-progress-header {
+    font-size: 32px;
+  }
+
+  .screen-fundraiser-progress-footer {
+    font-size: 36px;
+  }
+}
+
+/* end: Responsive Media Queries */
+
+
+/* ============================================================
+   Donation Summary Slide  (.screen-donation-slide)
+   All selectors scoped under .screen-donation-slide to avoid
+   any conflicts with existing app styles.
+   Class names mirror new_page.html exactly (with ds- prefix).
+   ============================================================ */
+
+/* start: Donation Summary */
+.screen-donation-slide {
+  width: 100%;
+  height: 100%;
+  background: #00ad70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Fixed 1551×959 canvas — scaled by JS via scaleDonationCanvas() */
+#donation-slide-canvas {
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(0deg, #00ad70, #00ad70);
+  width: 1551px;
+  height: 959px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transform-origin: center center;
+}
+
+/* ----- Header ----- */
+.screen-donation-slide .ds-header {
+  position: absolute;
+  left: 60px;
+  top: 86px;
+}
+
+.screen-donation-slide .ds-mosque-name {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 16.5967px;
+  line-height: 22px;
+  letter-spacing: 4.97902px;
+  color: #ffffff;
+  margin-bottom: 11.66px;
+}
+
+.screen-donation-slide .ds-page-title {
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  font-size: 49.7902px;
+  line-height: 55px;
+  color: #ffffff;
+}
+
+/* ----- Date / Time ----- */
+.screen-donation-slide .ds-datetime-container {
+  position: absolute;
+  right: 62px;
+  top: 80px;
+  text-align: right;
+}
+
+.screen-donation-slide .ds-time {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 66.387px;
+  line-height: 66px;
+  color: #f3f4f6;
+  margin-bottom: 5.92px;
+}
+
+.screen-donation-slide .ds-date {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 19.3629px;
+  line-height: 28px;
+  color: #ffffff;
+}
+
+/* ----- Cards ----- */
+.screen-donation-slide .ds-cards-container {
+  position: absolute;
+  top: 251px;
+  left: 62px;
+  display: flex;
+  gap: 25px;
+}
+
+.screen-donation-slide .ds-card {
+  background: #ffffff;
+  border-radius: 8px;
+  width: 459px;
+  height: 628px;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen-donation-slide .ds-card-header {
+  padding: 30px 26.66px 0;
+}
+
+.screen-donation-slide .ds-card-title {
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  font-size: 31.9955px;
+  line-height: 38px;
+  color: #1e1515;
+  margin-bottom: 24px;
+}
+
+.screen-donation-slide .ds-card-total {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 38.3946px;
+  line-height: 43px;
+  margin-bottom: 23px;
+}
+
+.screen-donation-slide .ds-total-green {
+  background: linear-gradient(90deg, rgba(0, 173, 112, 0.8) 0%, #00ad70 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.screen-donation-slide .ds-total-gold {
+  color: #c9a84c;
+}
+
+.screen-donation-slide .ds-contributor-subtitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14.9312px;
+  line-height: 21px;
+  color: #1e1515;
+  margin-bottom: 42px;
+}
+
+.screen-donation-slide .ds-card-divider {
+  border: none;
+  border-top: 2px solid #f7f7f7;
+  margin: 0;
+}
+
+/* ----- Scroll area ----- */
+.screen-donation-slide .ds-items-scroll-container {
+  position: absolute;
+  top: 161px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.screen-donation-slide .ds-items-scroll-wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.screen-donation-slide .ds-items-list {
+  padding: 10px 26.66px 0;
+}
+
+/* ----- Items ----- */
+.screen-donation-slide .ds-donation-item {
+  background: #e8f8f0;
+  border: 1.06652px solid #b8e8d4;
+  border-radius: 8.53214px;
+  height: 61.86px;
+  display: flex;
+  align-items: center;
+  padding: 0 13.86px;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.screen-donation-slide .ds-donation-item-gold {
+  background: #fffbf3;
+  border-color: #e2c061;
+}
+
+.screen-donation-slide .ds-donation-item-gray {
+  background: #f7f7f7;
+  border-color: #e3e9f0;
+}
+
+/* ----- Item internals ----- */
+.screen-donation-slide .ds-item-number {
+  width: 34.13px;
+  height: 34.13px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 14.06px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.screen-donation-slide .ds-number-green {
+  background: linear-gradient(90deg, rgba(0, 173, 112, 0.8) 0%, #00ad70 100%);
+}
+
+.screen-donation-slide .ds-number-gold {
+  background: linear-gradient(0deg, #c9a84c, #c9a84c);
+}
+
+.screen-donation-slide .ds-number-gray {
+  background: #e3e9f0;
+  color: #656565;
+}
+
+.screen-donation-slide .ds-item-label {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 17.0643px;
+  line-height: 26px;
+  color: #1e1515;
+  margin-left: 12.93px;
+  flex: 1;
+}
+
+.screen-donation-slide .ds-item-label-gray {
+  font-weight: 500;
+  color: #656565;
+}
+
+.screen-donation-slide .ds-item-amount {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 17px;
+}
+
+.screen-donation-slide .ds-amount-green {
+  background: linear-gradient(90deg, rgba(0, 173, 112, 0.8) 0%, #00ad70 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.screen-donation-slide .ds-amount-gold {
+  background: linear-gradient(0deg, #c9a84c, #c9a84c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ----- TOP badge ----- */
+.screen-donation-slide .ds-top-badge {
+  display: flex;
+  align-items: center;
+  gap: 5.2px;
+}
+
+.screen-donation-slide .ds-star-icon {
+  width: 14.93px;
+  height: 14.93px;
+  position: relative;
+}
+
+.screen-donation-slide .ds-star-icon::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(%23clip0_21377_126)"><path d="M7.17347 1.43121C7.22925 1.31843 7.34409 1.24707 7.46982 1.24707C7.59554 1.24707 7.71038 1.31843 7.76616 1.43121L9.20731 4.35292C9.40002 4.74327 9.77197 5.01402 10.2024 5.07725L13.4253 5.54932C13.5499 5.56739 13.6534 5.65468 13.6924 5.7745C13.7313 5.89431 13.6989 6.02585 13.6087 6.11381L11.2779 8.38548C10.9659 8.68983 10.8234 9.12831 10.8968 9.55816L11.447 12.7677C11.469 12.8924 11.418 13.0187 11.3157 13.0931C11.2134 13.1674 11.0776 13.1769 10.966 13.1174L8.08496 11.6013C7.6996 11.3988 7.23941 11.3988 6.85405 11.6013L3.97362 13.1174C3.86204 13.1765 3.72655 13.1669 3.62444 13.0926C3.52233 13.0182 3.47142 12.8922 3.49324 12.7677L4.04287 9.55878C4.11658 9.12872 3.97401 8.68991 3.66169 8.38548L1.33089 6.11443C1.24 6.02657 1.20709 5.89454 1.24609 5.77424C1.2851 5.65394 1.38919 5.5664 1.51431 5.5487L4.73662 5.07725C5.16754 5.01451 5.54007 4.74367 5.73295 4.35292L7.17347 1.43121Z" fill="%23C9A84C" stroke="%23C9A84C" stroke-width="2.13303" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_21377_126"><rect width="14.9312" height="14.9312" fill="white"/></clipPath></defs></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.screen-donation-slide .ds-top-text {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12.7982px;
+  line-height: 17px;
+  color: #c9a84c;
+}
+
+/* ----- Scroll animation ----- */
+@keyframes donation-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.screen-donation-slide .ds-scrolling {
+  animation: donation-scroll linear infinite;
+  /* animation-duration set by JS */
+}
+/* end: Donation Summary */
