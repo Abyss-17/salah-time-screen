@@ -5,6 +5,211 @@
   var isHotReload = !!window.SalahTimeApp;
   var previousInstance = window.SalahTimeApp;
 
+  // ES5 compatibility polyfills for older Smart TV browsers
+  (function () {
+    // Object.entries
+    if (!Object.entries) {
+      Object.entries = function (obj) {
+        var res = [];
+        for (var k in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, k)) {
+            res.push([k, obj[k]]);
+          }
+        }
+        return res;
+      };
+    }
+    // Array.from (basic)
+    if (!Array.from) {
+      Array.from = function (arrayLike) {
+        if (arrayLike == null) return [];
+        var arr = [];
+        for (var i = 0; i < arrayLike.length; i++) {
+          arr.push(arrayLike[i]);
+        }
+        return arr;
+      };
+    }
+    // Object.assign
+    if (!Object.assign) {
+      Object.assign = function (target) {
+        if (target == null) throw new TypeError("Cannot convert undefined or null to object");
+        var to = Object(target);
+        for (var i = 1; i < arguments.length; i++) {
+          var next = arguments[i];
+          if (next != null) {
+            for (var key in next) {
+              if (Object.prototype.hasOwnProperty.call(next, key)) {
+                to[key] = next[key];
+              }
+            }
+          }
+        }
+        return to;
+      };
+    }
+    // Array.prototype.find
+    if (!Array.prototype.find) {
+      Array.prototype.find = function (predicate) {
+        if (this == null) throw new TypeError("Array.prototype.find called on null or undefined");
+        if (typeof predicate !== "function") throw new TypeError("predicate must be a function");
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        for (var i = 0; i < length; i++) {
+          var value = list[i];
+          if (predicate.call(thisArg, value, i, list)) return value;
+        }
+        return undefined;
+      };
+    }
+    // Array.prototype.findIndex
+    if (!Array.prototype.findIndex) {
+      Array.prototype.findIndex = function (predicate) {
+        if (this == null) throw new TypeError("Array.prototype.findIndex called on null or undefined");
+        if (typeof predicate !== "function") throw new TypeError("predicate must be a function");
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        for (var i = 0; i < length; i++) {
+          if (predicate.call(thisArg, list[i], i, list)) return i;
+        }
+        return -1;
+      };
+    }
+    // Minimal Promise shim if missing (covers Promise.all and basic then chaining)
+    if (typeof Promise === "undefined") {
+      (function () {
+        var P = function (executor) {
+          var self = this;
+          self._state = 0;
+          self._value = undefined;
+          self._handlers = [];
+          function fulfill(v) {
+            if (self._state !== 0) return;
+            self._state = 1;
+            self._value = v;
+            setTimeout(function () {
+              for (var i = 0; i < self._handlers.length; i++) {
+                if (self._handlers[i].onFulfilled) {
+                  try {
+                    self._handlers[i].onFulfilled(v);
+                  } catch (e) {}
+                }
+              }
+              self._handlers = [];
+            }, 0);
+          }
+          function reject(r) {
+            if (self._state !== 0) return;
+            self._state = 2;
+            self._value = r;
+            setTimeout(function () {
+              for (var i = 0; i < self._handlers.length; i++) {
+                if (self._handlers[i].onRejected) {
+                  try {
+                    self._handlers[i].onRejected(r);
+                  } catch (e) {}
+                }
+              }
+              self._handlers = [];
+            }, 0);
+          }
+          self.then = function (onFulfilled, onRejected) {
+            return new P(function (resolveNext, rejectNext) {
+              function _onFulfilled(v) {
+                if (typeof onFulfilled === "function") {
+                  try {
+                    var ret = onFulfilled(v);
+                    if (ret && typeof ret.then === "function") {
+                      ret.then(resolveNext, rejectNext);
+                    } else {
+                      resolveNext(ret);
+                    }
+                  } catch (e) {
+                    rejectNext(e);
+                  }
+                } else {
+                  resolveNext(v);
+                }
+              }
+              function _onRejected(e) {
+                if (typeof onRejected === "function") {
+                  try {
+                    var ret2 = onRejected(e);
+                    if (ret2 && typeof ret2.then === "function") {
+                      ret2.then(resolveNext, rejectNext);
+                    } else {
+                      resolveNext(ret2);
+                    }
+                  } catch (er) {
+                    rejectNext(er);
+                  }
+                } else {
+                  rejectNext(e);
+                }
+              }
+              if (self._state === 0) {
+                self._handlers.push({ onFulfilled: _onFulfilled, onRejected: _onRejected });
+              } else if (self._state === 1) {
+                setTimeout(function () {
+                  _onFulfilled(self._value);
+                }, 0);
+              } else if (self._state === 2) {
+                setTimeout(function () {
+                  _onRejected(self._value);
+                }, 0);
+              }
+            });
+          };
+          self.catch = function (onRejected) {
+            return self.then(null, onRejected);
+          };
+          try {
+            executor(fulfill, reject);
+          } catch (ex) {
+            reject(ex);
+          }
+        };
+        P.resolve = function (v) {
+          return new P(function (r) {
+            r(v);
+          });
+        };
+        P.reject = function (e) {
+          return new P(function (_, rej) {
+            rej(e);
+          });
+        };
+        P.all = function (arr) {
+          return new P(function (resolve, reject) {
+            if (!arr || arr.length === 0) {
+              resolve([]);
+              return;
+            }
+            var results = [];
+            var remaining = arr.length;
+            for (var i = 0; i < arr.length; i++) {
+              (function (pIndex) {
+                P.resolve(arr[pIndex]).then(
+                  function (val) {
+                    results[pIndex] = val;
+                    remaining--;
+                    if (remaining === 0) resolve(results);
+                  },
+                  function (err) {
+                    reject(err);
+                  },
+                );
+              })(i);
+            }
+          });
+        };
+        window.Promise = P;
+      })();
+    }
+  })();
+
   // Don't destroy yet - wait until we successfully initialize
   // This protects against runtime errors in new code
 
@@ -1061,9 +1266,11 @@
   }
 
   function scheduleSalahDataRefresh() {
-    if (STATE.salahTimes.current) {
-      TIMEOUTS.salahTimes = setTimeout(fetchVersion, 1 * 60 * 1000); // 1 minute
+    // Always schedule next check regardless of current data state
+    if (TIMEOUTS.salahTimes) {
+      clearTimeout(TIMEOUTS.salahTimes);
     }
+    TIMEOUTS.salahTimes = setTimeout(fetchVersion, 1 * 60 * 1000); // 1 minute
   }
 
   function scheduleSalahDataRetry() {
@@ -1344,7 +1551,10 @@
         adjustedWidget.screen_order !== null &&
         adjustedWidget.screen_order !== undefined
       ) {
-        adjustedWidget.screen_order = adjustedWidget.screen_order + 100;
+        adjustedWidget.screen_order = Number(adjustedWidget.screen_order) + 100;
+      } else {
+        // Default public widgets to order 100 when not specified by API
+        adjustedWidget.screen_order = 100;
       }
 
       var element = WidgetFactory.create(adjustedWidget);
@@ -1785,10 +1995,13 @@
 
     createText: function (widget) {
       var element = this.createWidgetElement(widget);
+      var bg = widget.text_widget_background
+        ? escapeHtml(String(widget.text_widget_background))
+        : "transparent";
       element.innerHTML =
         this.createStatusBadge(widget) +
         '<div class="screen-text" style="--theme-bg: ' +
-        widget.text_widget_background +
+        bg +
         '; --theme-text-color: #fff;">' +
         '<p class="screen-text-text">' +
         formatBreakLines(widget.text_widget_content) +
@@ -1913,11 +2126,12 @@
 
       // Build QR code footer HTML
       var qrCode = (campaign.qr_code || "").trim();
+      var safeQr = qrCode ? escapeHtml(String(qrCode)) : "";
       var footerQrHtml = qrCode
         ? '<div class="screen-fundraiser-right-footer-qr">' +
           '<div class="screen-fundraiser-right-footer-qr-wrapper">' +
           '<img src="' +
-          qrCode +
+          safeQr +
           '" alt="QR Code" class="screen-fundraiser-right-footer-qr-image">' +
           "</div>" +
           "</div>"
@@ -1932,9 +2146,10 @@
           '">';
         images.forEach(function (img, idx) {
           var activeClass = idx === 0 ? " active" : "";
+          var safeName = encodeURIComponent(String(img).trim());
           carouselImagesHTML +=
             '<img src="/api/mosque/donation-wishlist/image/' +
-            img.trim() +
+            safeName +
             '" alt="Campaign" class="screen-fundraiser-image' +
             activeClass +
             '">';
@@ -2009,8 +2224,12 @@
       var element = document.createElement("div");
       element.classList.add("screen-slide");
       element.setAttribute("data-screen-slide", widget.id);
-      element.setAttribute("data-screen-slide-order", widget.screen_order);
-      element.setAttribute("data-screen-slide-updated", widget.updated_at);
+      var orderValue = widget.screen_order != null ? widget.screen_order : 0;
+      element.setAttribute("data-screen-slide-order", String(orderValue));
+      element.setAttribute(
+        "data-screen-slide-updated",
+        widget.updated_at,
+      );
       element.setAttribute("data-screen-size", widget.screen_size || "full");
       return element;
     },
@@ -2322,7 +2541,13 @@
   function updateElements(selector, content) {
     try {
       document.querySelectorAll(selector).forEach(function (el) {
-        el.innerHTML = content;
+        // If content appears to contain HTML tags, set as innerHTML,
+        // otherwise use textContent to avoid XSS from remote data.
+        if (typeof content === "string" && content.indexOf("<") === -1) {
+          el.textContent = content;
+        } else {
+          el.innerHTML = content;
+        }
       });
     } catch (e) {
       // Ignore element update errors
@@ -2598,39 +2823,7 @@
     }
   }
 
-  function updateClockHands(now) {
-    if (
-      !DOM.analogClock.hourHand ||
-      !DOM.analogClock.minuteHand ||
-      !DOM.analogClock.secondHand
-    ) {
-      return;
-    }
-
-    var hours = now.getHours() % 12;
-    var minutes = now.getMinutes();
-    var seconds = now.getSeconds();
-
-    var hourAngle = hours * 30 + minutes * 0.5;
-    var minuteAngle = minutes * 6;
-    var secondAngle = seconds * 6;
-
-    // Track second angle for stuck detection
-    CLOCK_STATE.lastSecondAngle = secondAngle;
-
-    try {
-      DOM.analogClock.hourHand.style.transform = "rotate(" + hourAngle + "deg)";
-      DOM.analogClock.minuteHand.style.transform =
-        "rotate(" + minuteAngle + "deg)";
-      DOM.analogClock.secondHand.style.transform =
-        "rotate(" + secondAngle + "deg)";
-    } catch (e) {
-      // DOM element may have been removed - re-cache next tick
-      DOM.analogClock.hourHand = null;
-      DOM.analogClock.minuteHand = null;
-      DOM.analogClock.secondHand = null;
-    }
-  }
+  
 
   function updateNextPrayer() {
     try {
@@ -3043,7 +3236,13 @@
 
   function formatBreakLines(text) {
     if (!text) return "";
-    return text.replace(/(\r\n)+/g, "<br>");
+    // Escape HTML to prevent XSS, then normalize newlines to <br>
+    try {
+      var escaped = escapeHtml(String(text));
+      return escaped.replace(/\r\n|\n/g, "<br>");
+    } catch (e) {
+      return escapeHtml(String(text)).replace(/\r\n|\n/g, "<br>");
+    }
   }
 
   function isRamadan() {
