@@ -147,9 +147,7 @@ body {
   margin-left: 4px;
   margin-bottom: 2px;
   font-family: Poppins;
-  font-weight: 500;
   color: #7f91a5;
-
   font-weight: 500;
   font-size: clamp(9px, 0.71vw, 10px);
 }
@@ -235,7 +233,6 @@ body {
   color: #1e1515;
 }
 .screen-time-next-time {
-  font-weight: 500;
   color: #5e7999;
   line-height: 1.2;
   font-family: Poppins;
@@ -244,7 +241,6 @@ body {
 }
 .screen-time-next-time > span {
   font-size: clamp(28px, 2.85vw, 44px);
-  font-weight: 700;
   display: inline-block;
   margin-left: 0.5vw;
   margin-right: 0.3vw;
