@@ -52,6 +52,7 @@
     jamaatWarning: null,
     jamaatInProgress: null,
     donationData: null,
+    donationScroll: null,
   };
 
   // Track clock health
@@ -547,9 +548,17 @@
    * @returns {Promise<string>} - The validated HTML content
    */
   function fetchHtmlViaJson() {
+    var mosqueIdFromParams = STATE.params.get("mosque_id");
+    var safeMosqueId =
+      typeof mosqueId !== "undefined" && mosqueId
+        ? mosqueId
+        : mosqueIdFromParams;
+    if (!safeMosqueId) {
+      throw new Error("Missing mosque_id for HTML reload fetch");
+    }
     // Build JSON URL using the known salah-time endpoint directly
     // This avoids issues with short URLs like /sid6419 that might redirect
-    var jsonUrl = "/salah-time/?mosque_id=" + mosqueId + "&json=1";
+    var jsonUrl = "/salah-time/?mosque_id=" + safeMosqueId + "&json=1";
 
     console.log("[SalahTimeApp] Fetching HTML via JSON endpoint...");
 
@@ -2545,21 +2554,10 @@
     try {
       var now = new Date();
 
-      var hours = now.getHours() % 12;
-      var minutes = now.getMinutes();
-      var seconds = now.getSeconds();
-
-      var hourAngle = hours * 30 + minutes * 0.5;
-      var minuteAngle = minutes * 6;
-      var secondAngle = seconds * 6;
-
-      hourHand.style.transform = "rotate(" + hourAngle + "deg)";
-      minuteHand.style.transform = "rotate(" + minuteAngle + "deg)";
-      secondHand.style.transform = "rotate(" + secondAngle + "deg)";
+      updateClockHands(now, hourHand, minuteHand, secondHand);
 
       // Track last successful update
       CLOCK_STATE.lastUpdateTime = Date.now();
-      CLOCK_STATE.lastSecondAngle = secondAngle;
 
       if (STATE.salahTimes.current) {
         updateNextPrayer();
@@ -2598,12 +2596,8 @@
     }
   }
 
-  function updateClockHands(now) {
-    if (
-      !DOM.analogClock.hourHand ||
-      !DOM.analogClock.minuteHand ||
-      !DOM.analogClock.secondHand
-    ) {
+  function updateClockHands(now, hourHand, minuteHand, secondHand) {
+    if (!hourHand || !minuteHand || !secondHand) {
       return;
     }
 
@@ -2619,16 +2613,11 @@
     CLOCK_STATE.lastSecondAngle = secondAngle;
 
     try {
-      DOM.analogClock.hourHand.style.transform = "rotate(" + hourAngle + "deg)";
-      DOM.analogClock.minuteHand.style.transform =
-        "rotate(" + minuteAngle + "deg)";
-      DOM.analogClock.secondHand.style.transform =
-        "rotate(" + secondAngle + "deg)";
+      hourHand.style.transform = "rotate(" + hourAngle + "deg)";
+      minuteHand.style.transform = "rotate(" + minuteAngle + "deg)";
+      secondHand.style.transform = "rotate(" + secondAngle + "deg)";
     } catch (e) {
-      // DOM element may have been removed - re-cache next tick
-      DOM.analogClock.hourHand = null;
-      DOM.analogClock.minuteHand = null;
-      DOM.analogClock.secondHand = null;
+      // DOM element may have been removed - updateClock will re-query next tick
     }
   }
 
@@ -3175,6 +3164,10 @@
 
   function setupDonationInfiniteScroll(containerId, itemsHtml, itemCount) {
     try {
+      if (TIMEOUTS.donationScroll) {
+        clearTimeout(TIMEOUTS.donationScroll);
+        TIMEOUTS.donationScroll = null;
+      }
       var container = document.getElementById(containerId);
       if (!container) return;
 
@@ -3186,7 +3179,7 @@
       }
 
       container.innerHTML = itemsHtml + itemsHtml;
-      setTimeout(function () {
+      TIMEOUTS.donationScroll = setTimeout(function () {
         try {
           var singleHeight = container.scrollHeight / 2;
           var duration = Math.max(4, singleHeight / DONATION_SCROLL_PX_PER_SEC);
@@ -3200,6 +3193,8 @@
           try {
             container.innerHTML = itemsHtml;
           } catch (e2) {}
+        } finally {
+          TIMEOUTS.donationScroll = null;
         }
       }, 2000);
     } catch (err) {
